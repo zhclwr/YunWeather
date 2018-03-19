@@ -11,8 +11,6 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val cityDao = (application as App).daoSession.cityDao
-        val list = cityDao.loadAll()
-        Log.i("数据库中数据数量--------->",list.size.toString())
+
     }
 }

@@ -15,7 +15,7 @@ import com.victor.yunweather.model.bean.City;
 /** 
  * DAO for table "CITY".
 */
-public class CityDao extends AbstractDao<City, Integer> {
+public class CityDao extends AbstractDao<City, Long> {
 
     public static final String TABLENAME = "CITY";
 
@@ -24,7 +24,7 @@ public class CityDao extends AbstractDao<City, Integer> {
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property Id = new Property(0, int.class, "id", true, "ID");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property CityCode = new Property(1, String.class, "cityCode", false, "CITY_CODE");
         public final static Property CityName = new Property(2, String.class, "cityName", false, "CITY_NAME");
         public final static Property Province = new Property(3, String.class, "province", false, "PROVINCE");
@@ -44,7 +44,7 @@ public class CityDao extends AbstractDao<City, Integer> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"CITY\" (" + //
-                "\"ID\" INTEGER PRIMARY KEY NOT NULL ," + // 0: id
+                "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"CITY_CODE\" TEXT," + // 1: cityCode
                 "\"CITY_NAME\" TEXT," + // 2: cityName
                 "\"PROVINCE\" TEXT," + // 3: province
@@ -60,7 +60,11 @@ public class CityDao extends AbstractDao<City, Integer> {
     @Override
     protected final void bindValues(DatabaseStatement stmt, City entity) {
         stmt.clearBindings();
-        stmt.bindLong(1, entity.getId());
+ 
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
  
         String cityCode = entity.getCityCode();
         if (cityCode != null) {
@@ -86,7 +90,11 @@ public class CityDao extends AbstractDao<City, Integer> {
     @Override
     protected final void bindValues(SQLiteStatement stmt, City entity) {
         stmt.clearBindings();
-        stmt.bindLong(1, entity.getId());
+ 
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
  
         String cityCode = entity.getCityCode();
         if (cityCode != null) {
@@ -110,14 +118,14 @@ public class CityDao extends AbstractDao<City, Integer> {
     }
 
     @Override
-    public Integer readKey(Cursor cursor, int offset) {
-        return cursor.getInt(offset + 0);
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     @Override
     public City readEntity(Cursor cursor, int offset) {
         City entity = new City( //
-            cursor.getInt(offset + 0), // id
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // cityCode
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // cityName
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // province
@@ -128,7 +136,7 @@ public class CityDao extends AbstractDao<City, Integer> {
      
     @Override
     public void readEntity(Cursor cursor, City entity, int offset) {
-        entity.setId(cursor.getInt(offset + 0));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setCityCode(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setCityName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setProvince(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
@@ -136,12 +144,13 @@ public class CityDao extends AbstractDao<City, Integer> {
      }
     
     @Override
-    protected final Integer updateKeyAfterInsert(City entity, long rowId) {
-        return entity.getId();
+    protected final Long updateKeyAfterInsert(City entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     @Override
-    public Integer getKey(City entity) {
+    public Long getKey(City entity) {
         if(entity != null) {
             return entity.getId();
         } else {
@@ -151,7 +160,7 @@ public class CityDao extends AbstractDao<City, Integer> {
 
     @Override
     public boolean hasKey(City entity) {
-        throw new UnsupportedOperationException("Unsupported for entities with a non-null key");
+        return entity.getId() != null;
     }
 
     @Override

@@ -5,21 +5,19 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
 
 
-/**
- * Created by victor on 2018/3/16.
- */
-
 @Entity
 public class City {
+    //greendao 主键是long的话，如果值是0就会报错，用Long 的话，不赋值，就回插入null
+    //
     @Id
-    private int id;
+    private Long id;
 
     private String cityCode;
     private String cityName;
     private String province;
     private String city;
-    @Generated(hash = 2105453691)
-    public City(int id, String cityCode, String cityName, String province,
+    @Generated(hash = 1510656651)
+    public City(Long id, String cityCode, String cityName, String province,
             String city) {
         this.id = id;
         this.cityCode = cityCode;
@@ -30,10 +28,10 @@ public class City {
     @Generated(hash = 750791287)
     public City() {
     }
-    public int getId() {
+    public Long getId() {
         return this.id;
     }
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
     public String getCityCode() {
@@ -60,7 +58,6 @@ public class City {
     public void setCity(String city) {
         this.city = city;
     }
-
 
 
 }
