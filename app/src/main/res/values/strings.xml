@@ -2,4 +2,6 @@
     <string name="app_name">YunWeather</string>
     <string name="loading">正在升级数据库</string>
     <string name="confirm">确认</string>
+    <string name="china_weather">和风天气 | 中国天气网</string>
+    <string name="input_city">输入城市名</string>
 </resources>

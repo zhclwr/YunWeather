@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +15,7 @@ import android.widget.TextView;
 
 import com.victor.yunweather.R;
 import com.victor.yunweather.app.App;
+import com.victor.yunweather.base.BaseActivity;
 import com.victor.yunweather.db.CityDao;
 import com.victor.yunweather.db.DaoSession;
 import com.victor.yunweather.model.bean.City;
@@ -30,7 +30,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class UpdateActivity extends AppCompatActivity {
+public class UpdateActivity extends BaseActivity {
 
     @BindView(R.id.tv_load)
     TextView mTvLoad;
@@ -65,13 +65,20 @@ public class UpdateActivity extends AppCompatActivity {
                         case 1:
                             mTvLoad.setText("已升级完数据库");
                             mBtConfirm.setVisibility(View.VISIBLE);
+                            sp.edit().putBoolean("data",true).apply();
                             break;
                     }
                 }
             };
-            save();
         }
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        save();
+    }
+
     /**
      * 进入主页面
      * */
@@ -95,18 +102,30 @@ public class UpdateActivity extends AppCompatActivity {
                     in  = getAssets().open("china-city-list.txt");
                     reader = new BufferedReader(new InputStreamReader(in));
                     String line;
-                    int num = 0;
+                    float num = 0f;
+                    int lastNum = 0;
                     while ((line = reader.readLine())!=null){
                         String[] strs = line.split("\t");
+                        num = num + 1f;
                         city = new City();
                         city.setCityCode(strs[0]);
                         city.setCityName(strs[2]);
                         city.setProvince(strs[7]);
                         city.setCity(strs[9]);
+                        //故意一个一个写到数据库
+//                        cityDao.insert(city);
+                        //本来存到一个list里面，存完一起写
                         cities.add(city);
-                        Message msg0 = new Message();
-                        msg0.what = 0;
-                        handler.sendMessage(msg0);
+
+                        int position = (int) (num/3181f*100);
+                        Log.i("position = ", position+"");
+                        if ((position-lastNum)==1){
+                            lastNum = position;
+                            Message msg0 = new Message();
+                            msg0.what = 0;
+                            handler.sendMessage(msg0);
+                        }
+
                     }
                     cityDao.insertInTx(cities);
                     Message msg1 = new Message();
@@ -127,6 +146,13 @@ public class UpdateActivity extends AppCompatActivity {
                     }
                 }
             }
+        }).start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //...
+            }
         }).run();
 
     }
@@ -138,6 +164,7 @@ public class UpdateActivity extends AppCompatActivity {
             default:
                 break;
             case R.id.bt_confirm:
+                startMain();
                 break;
         }
     }

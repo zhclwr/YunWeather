@@ -7,9 +7,6 @@ import com.victor.yunweather.db.DaoMaster;
 import com.victor.yunweather.db.DaoSession;
 
 
-/**
- * Created by victor on 2018/3/16.
- */
 
 public class App extends Application {
 
